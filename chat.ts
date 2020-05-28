@@ -31,6 +31,7 @@ export enum ChatChanel{
 export interface S2C_Chat{
   channel:number;
   content:string;
+  
 }
 //
 class Server extends WsServer {
