@@ -1,0 +1,97 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ws chat example</title>
+  </head>
+  <body>
+    <div>
+      <input type="text" id="input" />
+      <input type="text" id="input2" />
+      <button id="sendButton" disabled>send</button>
+      <button id="connectButton" disabled>connect</button>
+      <button id="closeButton" disabled>close</button>
+    </div>
+    <div id="status"></div>
+    <ul id="timeline"></ul>
+    <script>
+      let ws;
+      function messageDom(msg) {
+        const div = document.createElement("li");
+        div.className = "message";
+        div.innerText = msg;
+        return div;
+      }
+      const timeline = document.getElementById("timeline");
+      const sendButton = document.getElementById("sendButton");
+      sendButton.onclick = send;
+      const closeButton =document.getElementById("closeButton");
+      closeButton.onclick=close;
+      const connectButton = document.getElementById("connectButton");
+      connectButton.onclick=connect;
+      const status = document.getElementById("status");
+      const input = document.getElementById("input");
+      const input2 = document.getElementById("input2");
+      input.addEventListener("keydown", keyDownEvent);
+      function send() {
+        const msg = input.value;
+        let to = input2.value.split(',');
+        if(to.length==1 && to[0]==''){
+          to = 0;
+        }else{
+          for(let i=0;i<to.length;i++){
+          to[i] = to[i]*1;
+        }
+        }
+        
+        ws.send(JSON.stringify({
+          id:100,
+          to:to,
+          data:msg
+        }));
+        applyState({inputValue: ""});
+      }
+      function keyDownEvent(e) {
+        if (e.keyCode === 13) return send();
+      }
+      function connect() {
+        if (ws) ws.close();
+        ws = new WebSocket(`ws://127.0.0.1:8000/ws`);
+        ws.addEventListener("open", () => {
+          console.log("open", ws);
+          applyState({connected: true});
+        });
+        ws.addEventListener("message", ({data}) => {
+          console.log('recv',JSON.stringify(data));
+          timeline.appendChild(messageDom(data));
+        });
+        ws.addEventListener("close", () => {
+          applyState({connect: false});
+        });
+      }
+      function close() {
+        ws.close();
+        applyState({connected: false});
+      }
+      function applyState({connected, status, inputValue}) {
+        if (inputValue != null) {
+          input.value = inputValue;
+        }
+        if(status != null) {
+          status.innerText = status;
+        }
+        if (connected != null) {
+          if (connected) {
+            sendButton.disabled = false;
+            connectButton.disabled = true;
+            closeButton.disabled= false;
+          } else {
+            sendButton.disabled= true;
+            connectButton.disabled=false;
+            closeButton.disabled=true;
+          }
+        }
+      }
+      connect();
+    </script>
+  </body>
+</html>

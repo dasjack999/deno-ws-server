@@ -1,0 +1,5 @@
+// .vscode/settings.json
+{
+  "deno.enable": true,
+  "deno.tsconfig": "tsconfig.json"
+}
