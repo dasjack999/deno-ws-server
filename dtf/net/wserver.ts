@@ -19,6 +19,7 @@ import {
   WebSocketMessage,
   isWebSocketPingEvent,
   isWebSocketPongEvent,
+  WebSocketEvent,
 } from "https://deno.land/std/ws/mod.ts";
 import { parse } from "https://deno.land/std/flags/mod.ts";
 //the msg id
@@ -56,7 +57,7 @@ export class WsServer {
    *
    * @param msgIds
    */
-  constructor(msgIds: { [index: string]: any }) {
+  constructor(msgIds?: { [index: string]: any }) {
     this.addMsgIds(MsgId);
     if (msgIds) {
       this.addMsgIds(msgIds);
@@ -65,8 +66,14 @@ export class WsServer {
   /**
    * 
    */
-  public get options():any{
+  public get options(): any {
     return this.m_options;
+  }
+  /**
+   * 
+   */
+  public get msgIds(): { [index: string]: any } {
+    return MsgId;
   }
   /**
    * 
@@ -119,6 +126,51 @@ export class WsServer {
     if (this.m_server) {
       let ser = this.m_server as Server;
       ser.close();
+    }
+  }
+  /**
+     *
+     */
+  public send(cmd: Cmd): void {
+    //system flag
+    if (cmd.to < 0) {
+      return;
+    }
+    //get json by default
+    let to = cmd.to;
+    if (this.m_enableFilter) {
+      delete cmd.to;
+      delete cmd.from;
+    }
+    let msg = this.pack(cmd);
+    //send to someones
+    if (to) {
+      let arr = to as number[];
+      if (!Array.isArray(to)) {
+        arr = [to];
+      }
+      for (let i = 0, len = arr.length; i < len; i++) {
+        const client = this.m_clients.get(arr[i]);
+        if (client) {
+          if (client.isClosed) {
+            console.log("send err closed", client.conn.rid);
+            this.m_clients.delete(client.conn.rid);
+          } else {
+            client.send(msg);
+          }
+        }
+      }
+    } else {
+      //broadcast
+      let clients = this.m_clients.values();
+      for (const client of clients) {
+        if (client.isClosed) {
+          console.log("send err closed", client.conn.rid);
+          this.m_clients.delete(client.conn.rid);
+        } else {
+          client.send(msg);
+        }
+      }
     }
   }
   /**
@@ -188,21 +240,23 @@ export class WsServer {
 
     for await (const msg of ws) {
       console.log(`from:${ws.conn.rid}`, msg);
-      //json protocol arraybuffer protocol
-      if (typeof msg === "string" || msg instanceof Uint8Array) {
-        this.onMessage(ws, msg);
-      }
       //net events
       if (isWebSocketCloseEvent(msg)) {
         this.m_clients.delete(ws.conn.rid);
         this.onDisconnected(ws);
         break; //close conn
       }
+      //json protocol arraybuffer protocol
+      if (typeof msg === "string" || msg instanceof Uint8Array) {
+        this.onMessage(ws, msg);
+      }
       //
       if (isWebSocketPingEvent(msg)) {
+        this.onPing(msg);
       }
       //
       if (isWebSocketPongEvent(msg)) {
+        this.onPong(msg);
       }
     }
   }
@@ -237,48 +291,18 @@ export class WsServer {
     });
   }
   /**
-   *
+   * 
+   * @param cmd 
    */
-  protected send(cmd: Cmd): void {
-    //system flag
-    if (cmd.to < 0) {
-      return;
-    }
-    //get json by default
-    let to = cmd.to;
-    if (this.m_enableFilter) {
-      delete cmd.to;
-      delete cmd.from;
-    }
-    let msg = this.pack(cmd);
-    //send to someones
-    if (to) {
-      let arr = to as number[];
-      if (!Array.isArray(to)) {
-        arr = [to];
-      }
-      for (let i = 0, len = arr.length; i < len; i++) {
-        const client = this.m_clients.get(arr[i]);
-        if (client) {
-          if (client.isClosed) {
-            console.log("send err closed", client.conn.rid);
-            this.m_clients.delete(client.conn.rid);
-          } else {
-            client.send(msg);
-          }
-        }
-      }
-    } else {
-      //broadcast
-      let clients = this.m_clients.values();
-      for (const client of clients) {
-        if (client.isClosed) {
-          console.log("send err closed", client.conn.rid);
-          this.m_clients.delete(client.conn.rid);
-        } else {
-          client.send(msg);
-        }
-      }
-    }
+  protected onPing(msg: WebSocketEvent): void {
+    console.log('ping', msg);
   }
+  /**
+ * 
+ * @param cmd 
+ */
+  protected onPong(msg: WebSocketEvent): void {
+    console.log('pong', msg);
+  }
+
 }

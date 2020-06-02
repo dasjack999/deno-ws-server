@@ -9,9 +9,9 @@ import {
   WsServer,
   WebSocket,
   Cmd,
-} from "./wserver.ts";
+} from "../dtf/mod.ts";
 //
-export let AppMsgId: { [index: string]: any } = {
+export let MsgId: { [index: string]: any } = {
   Chat: 100,
   Kickout: 101,
 
@@ -41,7 +41,7 @@ class Server extends WsServer {
    */
   constructor() {
     
-    super(AppMsgId);
+    super(MsgId);
   }
   /**
    * 
@@ -50,12 +50,13 @@ class Server extends WsServer {
    */
   protected onChat(ws: WebSocket, cmd: Cmd): void {
     console.log("chat", cmd.data);
-    this.send({
-      id: cmd.id,
-      from: ws.conn.rid,
-      to: cmd.to || 0,
-      data: cmd.data,
-    });
+    this.request(cmd.id,cmd.data,cmd.to,ws.conn.rid);
+    // this.send({
+    //   id: cmd.id,
+    //   from: ws.conn.rid,
+    //   to: cmd.to || 0,
+    //   data: cmd.data,
+    // });
   }
   /**
    * 
