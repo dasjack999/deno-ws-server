@@ -218,14 +218,14 @@ export class WsServer {
    *
    * @param ws
    */
-  protected pack(cmd: Cmd): WebSocketMessage {
+  public pack(cmd: Cmd): WebSocketMessage {
     return JSON.stringify(cmd);
   }
   /**
    *
    * @param ws
    */
-  protected unPack(msg: WebSocketMessage): Cmd {
+  public unPack(msg: WebSocketMessage): Cmd {
     return JSON.parse(msg as string);
   }
   /**
