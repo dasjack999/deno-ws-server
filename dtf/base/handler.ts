@@ -1,5 +1,5 @@
 /********************************************************************************
- *the base ws server
+ *the base callback wrapper
  * 
  *author:    Jack Liu
  *dasjack@outlook.com

@@ -5,12 +5,11 @@
  *dasjack@outlook.com
  *version:   V1.0.0
 *********************************************************************************/
-import { ServerUseModule } from './dtf/base/server.ts'
-
+import { ModuleServer } from './dtf/mod.ts'
 import{Chat}from './modules/chat.ts';
 
 //
-class Server extends ServerUseModule {
+class Server extends ModuleServer {
     //
     constructor(){
         super();

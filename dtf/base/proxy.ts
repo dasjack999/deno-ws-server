@@ -5,9 +5,7 @@
  *dasjack@outlook.com
  *version:   V1.0.0
 *********************************************************************************/
-import { Module, WebSocket, Cmd, ServerUseModule, Handler } from '../mod.ts';
-import { connectWebSocket, WebSocketMessage, WebSocketEvent, isWebSocketCloseEvent } from "https://deno.land/std/ws/mod.ts";
-import { WsServer } from '../net/wserver.ts';
+import { connectWebSocket, WebSocket,WebSocketMessage, WebSocketEvent, isWebSocketCloseEvent,WsServer } from './wserver.ts';
 //
 export class Proxy extends WsServer {
     //
@@ -51,7 +49,7 @@ export class Proxy extends WsServer {
         this.connectAndServe(this.m_url, async (msg: WebSocketEvent) => {
             if (typeof msg === "string") {
                 // console.log(yellow(`< ${msg}`));
-                let pack = this.m_server.unPack(msg);
+                let pack = this.unPack(msg);
                 this.send(pack);
             }
 

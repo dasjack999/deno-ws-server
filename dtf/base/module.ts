@@ -5,21 +5,20 @@
  *dasjack@outlook.com
  *version:   V1.0.0
 *********************************************************************************/
-import { WsServer,WebSocket,Cmd } from '../net/wserver.ts'
-import { ServerUseModule } from './server.ts';
+import { IModuleServer, IModule } from './interfaces.ts';
 import { Handler } from './handler.ts';
 
 
-export class Module {
+export class Module implements IModule{
     //
     protected MsgId: { [index: string]: number } ={};
     //
-    protected m_server!: ServerUseModule;
+    protected m_server!: IModuleServer;
     /**
      * 
      * @param ser 
      */
-    public init(ser: ServerUseModule): void {
+    public init(ser: IModuleServer): void {
         this.m_server = ser;
         this.regServices(this.MsgId);
     }
@@ -45,7 +44,7 @@ export class Module {
      * @param to 
      * @param from 
      */
-    protected send(id: number, data?: any, to: number | number[] = 0, from: number = 0): void {
+    public send(id: number, data: any=null, to: number | number[] = 0, from: number = 0): void {
         if (!this.m_server) {
             return;
         }

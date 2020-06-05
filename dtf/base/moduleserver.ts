@@ -8,15 +8,13 @@
 import {
     WsServer,
     WebSocket,
-    WebSocketMessage,
-    Cmd,
-} from "../net/wserver.ts";
-
+    WebSocketMessage
+} from "./wserver.ts";
 import { Handler } from './handler.ts';
-import { Module } from "../mod.ts";
+import { IModuleServer,IModule } from "./interfaces.ts";
 
 //
-export class ServerUseModule extends WsServer {
+export class ModuleServer extends WsServer implements IModuleServer {
     //
     protected m_handlers: { [index: string]: Handler[] } = {};
     /**
@@ -25,7 +23,7 @@ export class ServerUseModule extends WsServer {
      */
     public addModule(...cf:any[]):void{
         cf.forEach((fn)=>{
-            let m:Module = new fn();
+            let m:IModule = new fn();
             m.init(this);
         });
     }

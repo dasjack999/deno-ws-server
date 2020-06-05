@@ -5,7 +5,7 @@
  *dasjack@outlook.com
  *version:   V1.0.0
 *********************************************************************************/
-import {Module,WebSocket,Cmd}from '../dtf/mod.ts';
+import {Module,WebSocket,ICmd}from '../dtf/mod.ts';
 
 //protocl define
 export enum ChatChanel {
@@ -38,7 +38,7 @@ export class Chat extends Module{
      * @param ws 
      * @param cmd 
      */
-    protected onChat(ws: WebSocket, cmd: Cmd): void {
+    protected onChat(ws: WebSocket, cmd: ICmd): void {
         console.log("chat", cmd.data);
         let sChat:S2C_Chat=cmd.data;
         
@@ -49,7 +49,7 @@ export class Chat extends Module{
        * @param ws 
        * @param cmd 
        */
-      protected onKickout(ws:WebSocket,cmd:Cmd):void{
+      protected onKickout(ws:WebSocket,cmd:ICmd):void{
         
     
       }

@@ -22,29 +22,32 @@ import {
   WebSocketEvent,
 } from "https://deno.land/std/ws/mod.ts";
 import { parse } from "https://deno.land/std/flags/mod.ts";
-//the msg id
-export let MsgId: { [index: string]: any } = {
-  connect: 1,
-  disconnect: 2,
-  message: 3,
-  max: 99, //system side
-};
+import {MsgId,ICmd, IServer} from '../base/interfaces.ts';
 //
-export interface Cmd {
-  id: number;
-  from: number;
-  to: number | number[];
-  data?: any;
-}
-//
-export { WebSocket, WebSocketMessage } from "https://deno.land/std/ws/mod.ts";
+export {
+  ServerRequest,
+  HTTPOptions,
+  serve,
+  Server,
+} from "https://deno.land/std/http/server.ts";
+export {
+  acceptWebSocket,
+  acceptable,
+  connectWebSocket,
+  WebSocket,
+  isWebSocketCloseEvent,
+  WebSocketMessage,
+  isWebSocketPingEvent,
+  isWebSocketPongEvent,
+  WebSocketEvent,
+} from "https://deno.land/std/ws/mod.ts";
 //////////////////////////////////////////////////////////////////////////////////////
 //
 //author:jack liu
 /////////////////////////////////////////////////////////////////////////////////////
-export class WsServer {
+export class WsServer implements IServer{
   //
-  protected m_server: any;
+  protected m_server !: Server;
   //
   private m_enableFilter: boolean = true;
   //
@@ -79,7 +82,7 @@ export class WsServer {
    * 
    * @param msgIds 
    */
-  public addMsgIds(msgIds: { [index: string]: any }) {
+  public addMsgIds(msgIds: { [index: string]: any }):void {
     for (let k in msgIds) {
       Object.defineProperty(MsgId, msgIds[k], {
         value: k,
@@ -97,7 +100,7 @@ export class WsServer {
     this.m_options = Object.assign({}, this.m_options, options);
     this.stop();
     this.m_stopped = false;
-    console.log("chat server starting on :", JSON.stringify(this.m_options));
+    console.log("server starting on :", JSON.stringify(this.m_options));
     //
     this.listenAndServe(options, async (req: ServerRequest) => {
       if (req.method === "GET" && req.url === "/ws") {
@@ -124,14 +127,13 @@ export class WsServer {
     this.m_stopped = true;
     this.m_clients.clear();
     if (this.m_server) {
-      let ser = this.m_server as Server;
-      ser.close();
+      this.m_server.close();
     }
   }
   /**
-     *
-     */
-  public send(cmd: Cmd): void {
+   *
+   */
+  public send(cmd: ICmd): void {
     //system flag
     if (cmd.to < 0) {
       return;
@@ -191,6 +193,20 @@ export class WsServer {
     }
   }
   /**
+   *
+   * @param ws
+   */
+  public pack(cmd: ICmd): WebSocketMessage {
+    return JSON.stringify(cmd);
+  }
+  /**
+   *
+   * @param ws
+   */
+  public unPack(msg: WebSocketMessage): ICmd {
+    return JSON.parse(msg as string);
+  }
+  /**
    * 
    * @param addr 
    * @param handler 
@@ -213,20 +229,6 @@ export class WsServer {
    */
   protected set enableFilter(enable: boolean) {
     this.m_enableFilter = enable;
-  }
-  /**
-   *
-   * @param ws
-   */
-  public pack(cmd: Cmd): WebSocketMessage {
-    return JSON.stringify(cmd);
-  }
-  /**
-   *
-   * @param ws
-   */
-  public unPack(msg: WebSocketMessage): Cmd {
-    return JSON.parse(msg as string);
   }
   /**
    *

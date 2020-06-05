@@ -5,15 +5,16 @@
  *dasjack@outlook.com
  *version:   V1.0.0
 *********************************************************************************/
-import { Module, WebSocket, Cmd, ServerUseModule, Handler } from '../mod.ts';
-import { connectWebSocket, WebSocketMessage, WebSocketEvent, isWebSocketCloseEvent } from "https://deno.land/std/ws/mod.ts";
+import { ICmd, IModuleServer, Handler } from './interfaces.ts';
+import {Module} from './module.ts';
+import { connectWebSocket, WebSocketEvent, isWebSocketCloseEvent } from "./wserver.ts";
 //
 export class Proxy extends Module {
     //
     protected MsgId: { [index: string]: any } = {
     };
     //
-    protected m_queue: Cmd[] = [];
+    protected m_queue: ICmd[] = [];
     //
     protected m_url: string = '';
     //
@@ -34,7 +35,7 @@ export class Proxy extends Module {
             if (this.m_queue.length == 0) {
                 return;
             }
-            let cmd = this.m_queue.shift() as Cmd;
+            let cmd = this.m_queue.shift() as ICmd;
 
             client.send(this.m_server.pack(cmd));
         }, 60);
@@ -47,7 +48,7 @@ export class Proxy extends Module {
      * 
      * @param ser 
      */
-    public init(ser: ServerUseModule) {
+    public init(ser: IModuleServer) {
 
         this.m_server = ser;
         this.regServices(this.MsgId);
