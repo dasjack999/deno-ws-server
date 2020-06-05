@@ -56,6 +56,8 @@ export class WsServer implements IServer{
   protected m_options: {} = {};
   //
   protected m_clients: Map<number, WebSocket> = new Map<number, WebSocket>();
+  //
+  protected m_rooms:{[key:string]:Set<number>}={};
   /**
    *
    * @param msgIds
@@ -174,6 +176,64 @@ export class WsServer implements IServer{
         }
       }
     }
+  }
+  /**
+   * 
+   * @param cmd 
+   * @param room_id 
+   */
+  public sendToRoom(cmd:ICmd):void{
+    let room_id = cmd.to;
+    let roomIds= Array.isArray(room_id) ? room_id : [room_id];
+    let all:number[]=[];
+    for (let id of roomIds){
+      let members = this.m_rooms[id];
+      if(members){
+         
+        all = all.concat(Array.from(members));
+      }
+    }
+    let ncmd:ICmd={
+      id:cmd.id,
+      to:all,
+      from:cmd.from,
+      data:cmd.data
+    };
+    
+    this.send(ncmd);
+    
+  }
+  /**
+   * 
+   * @param room_id 
+   * @param cid 
+   */
+  public joinRoom(room_id:number,cid:number|number[]):void{
+
+    let room = this.m_rooms[room_id];
+    if(!room){
+      room = this.m_rooms[room_id]=new Set<number>();
+    }
+    let arr= Array.isArray(cid) ? cid : [cid];
+    arr.forEach((cid:number)=>{
+      room.add(cid);
+    });
+
+  }
+  /**
+   * 
+   * @param room_id 
+   * @param cid 
+   */
+  public leaveRoom(room_id:number,cid:number|number[]):void{
+    let room = this.m_rooms[room_id];
+    if(!room){
+      return;
+    }
+    let arr= Array.isArray(cid) ? cid : [cid];
+    arr.forEach((cid:number)=>{
+      room.delete(cid);
+    });
   }
   /**
    *

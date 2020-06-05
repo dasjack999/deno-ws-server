@@ -9,7 +9,7 @@ import { Module, WebSocket, ICmd, IModuleServer } from '../dtf/mod.ts';
 
 //
 interface ICommand{
-
+    timestamp:number;
 }
 //
 interface IPos extends ICommand{
@@ -45,7 +45,9 @@ export class FrameSync extends Module {
     //
     public frameRate:number=33;
     //
-    protected m_cmdQueue:ICommand[]=[];
+    protected m_cmdQueue: { [index: string]: ICommand[] }={};
+    //
+    protected m_cur_ftime:number=Date.now();
     /**
      * 
      * @param ser 
@@ -64,7 +66,10 @@ export class FrameSync extends Module {
      */
     protected onPos(ws: WebSocket, cmd: ICmd): void {
         console.log("pos", cmd.data);
-        // let sChat:S2C_Chat=cmd.data;
+        let pos:IPos = cmd.data;
+        if(Date.now()-this.m_cur_ftime<=this.frameRate){
+            
+        }
 
         // this.send(cmd.id,cmd.data,cmd.to,ws.conn.rid);
     }
