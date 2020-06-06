@@ -35,7 +35,6 @@ export class Module implements IModule{
                 m&&m.apply(this,args);
             }));
         }
-        
     }
     /**
      * 

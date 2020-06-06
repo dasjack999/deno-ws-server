@@ -24,6 +24,7 @@ export interface S2C_Chat {
 }
 //
 export class Chat extends Module{
+    
     //
     protected MsgId: { [index: string]: any } = {
         Chat: 100,

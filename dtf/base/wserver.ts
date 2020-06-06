@@ -45,7 +45,7 @@ export {
 //
 //author:jack liu
 /////////////////////////////////////////////////////////////////////////////////////
-export class WsServer implements IServer{
+export class WsServer extends EventTarget implements IServer {
   //
   protected m_server !: Server;
   //
@@ -63,6 +63,7 @@ export class WsServer implements IServer{
    * @param msgIds
    */
   constructor(msgIds?: { [index: string]: any }) {
+    super();
     this.addMsgIds(MsgId);
     if (msgIds) {
       this.addMsgIds(msgIds);
@@ -299,6 +300,7 @@ export class WsServer implements IServer{
 
     console.log("connect from ", ws.conn.rid);
     this.onConnected(ws);
+    this.fireEvent('connected',ws);
 
     for await (const msg of ws) {
       console.log(`from:${ws.conn.rid}`, msg);
@@ -306,21 +308,39 @@ export class WsServer implements IServer{
       if (isWebSocketCloseEvent(msg)) {
         this.m_clients.delete(ws.conn.rid);
         this.onDisconnected(ws);
+        this.fireEvent('disconnected',ws);
         break; //close conn
       }
       //json protocol arraybuffer protocol
       if (typeof msg === "string" || msg instanceof Uint8Array) {
         this.onMessage(ws, msg);
+        this.fireEvent('message',{
+          ws:ws,
+          msg:msg
+        });
       }
       //
       if (isWebSocketPingEvent(msg)) {
         this.onPing(msg);
+        this.fireEvent('ping');
       }
       //
       if (isWebSocketPongEvent(msg)) {
         this.onPong(msg);
+        this.fireEvent('pong');
       }
     }
+  }
+  /**
+   * 
+   * @param type 
+   * @param params 
+   */
+  protected fireEvent(type:string,params?:any):void{
+    let evt:CustomEvent = new CustomEvent(type,{
+      detail:params
+    });
+    this.dispatchEvent(evt);
   }
   /**
    *
@@ -331,6 +351,7 @@ export class WsServer implements IServer{
       from: ws.conn.rid,
       to: 0,
     });
+    
   }
   /**
    *

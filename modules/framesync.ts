@@ -67,8 +67,10 @@ export class FrameSync extends Module {
     protected onPos(ws: WebSocket, cmd: ICmd): void {
         console.log("pos", cmd.data);
         let pos:IPos = cmd.data;
+        pos.timestamp = Date.now();
+     
         if(Date.now()-this.m_cur_ftime<=this.frameRate){
-            
+
         }
 
         // this.send(cmd.id,cmd.data,cmd.to,ws.conn.rid);
