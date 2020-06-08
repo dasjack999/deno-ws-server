@@ -5,7 +5,7 @@
  *dasjack@outlook.com
  *version:   V1.0.0
 *********************************************************************************/
-import {Module,WebSocket,ICmd}from '../dtf/mod.ts';
+import { Module, WebSocket, ICmd } from '../dtf/mod.ts';
 
 //protocl define
 export enum ChatChanel {
@@ -19,39 +19,39 @@ export enum ChatChanel {
 export interface S2C_Chat {
     channel: ChatChanel;
     content: string;
-    to?:number;
-    
+    to?: number;
+
 }
 //
-export class Chat extends Module{
-    
+export class Chat extends Module {
+
     //
     protected MsgId: { [index: string]: any } = {
         Chat: 100,
         Kickout: 101,
-        
-    
-    
-    
+
+
+
+
     };
     /**
      * 
      * @param ws 
      * @param cmd 
      */
-    protected onChat(ws: WebSocket, cmd: ICmd): void {
+    protected onChat(cmd: ICmd): void {
         console.log("chat", cmd.data);
-        let sChat:S2C_Chat=cmd.data;
-        
-        this.send(cmd.id,cmd.data,cmd.to,ws.conn.rid);
-      }
-      /**
-       * 
-       * @param ws 
-       * @param cmd 
-       */
-      protected onKickout(ws:WebSocket,cmd:ICmd):void{
-        
-    
-      }
+        let sChat: S2C_Chat = cmd.data;
+
+        this.send(cmd.id, cmd.data, cmd.to, cmd.from);
+    }
+    /**
+     * 
+     * @param ws 
+     * @param cmd 
+     */
+    protected onKickout(cmd: ICmd): void {
+
+
+    }
 }

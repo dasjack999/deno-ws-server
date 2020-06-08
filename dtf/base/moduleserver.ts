@@ -55,9 +55,11 @@ export class ModuleServer extends WsServer implements IModuleServer {
      */
     protected onMessage(ws: WebSocket, msg: WebSocketMessage): void {
         let cmd = this.unPack(msg);
+        cmd.from=ws.conn.rid;
         let handlers = this.m_handlers[cmd.id] || [];
         for (let i = 0, len = handlers.length; i < len; i++) {
-            if (handlers[i].runWith([ws, cmd])) {
+
+            if (handlers[i].runWith([cmd])) {
                 break;//stop 
             }
         }

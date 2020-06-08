@@ -358,10 +358,11 @@ export class WsServer extends EventTarget implements IServer {
    */
   protected onMessage(ws: WebSocket, msg: WebSocketMessage): void {
     let cmd = this.unPack(msg);
+    cmd.from=ws.conn.rid;
     let self: any = this;
     let handler = self["on" + MsgId[cmd.id]];
     // console.log('msg',cmd.id,MsgId[cmd.id],cmd.data);
-    handler && handler.call(this, ws, cmd);
+    handler && handler.call(this, cmd);
   }
   /**
    *

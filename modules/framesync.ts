@@ -64,7 +64,7 @@ export class FrameSync extends Module {
      * @param ws 
      * @param cmd 
      */
-    protected onPos(ws: WebSocket, cmd: ICmd): void {
+    protected onPos( cmd: ICmd): void {
         console.log("pos", cmd.data);
         let pos:IPos = cmd.data;
         pos.timestamp = Date.now();
@@ -80,7 +80,7 @@ export class FrameSync extends Module {
      * @param ws 
      * @param cmd 
      */
-    protected onAttack(ws: WebSocket, cmd: ICmd): void {
+    protected onAttack(cmd: ICmd): void {
 
 
     }
@@ -89,7 +89,7 @@ export class FrameSync extends Module {
      * @param ws 
      * @param cmd 
      */
-    protected onMoveTo(ws: WebSocket, cmd: ICmd): void {
+    protected onMoveTo(cmd: ICmd): void {
 
 
     }

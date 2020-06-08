@@ -72,7 +72,7 @@ export class Proxy extends Module {
         this.m_server.addMsgIds(msgIds);
         for(let k in msgIds){
             this.m_server.regHandler(msgIds[k],Handler.create(this,(...args:any[])=>{
-                let cmd = args[1];
+                let cmd = args[0];
                 this.m_queue.push(cmd);
             }));
         }
