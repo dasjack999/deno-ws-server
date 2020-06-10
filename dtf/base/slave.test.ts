@@ -16,7 +16,7 @@ export async function test(){
     //     console.log('worker job done',JSON.stringify(data));
     // }));
     //no result need to be waitted
-    logger.doWorkAsync('log','test async',true);
+    logger.doWork('log','test async',true);
     
     let res = await logger2.log('test async2');
     console.log('worker job2 done',JSON.stringify(res));

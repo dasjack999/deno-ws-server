@@ -102,7 +102,7 @@ export class Slave extends EventTarget {
             let fname=cmds[i] as string;
             let noResult = cmds[i+1] as boolean;
             alex[fname]= async(params?:any):Promise<IncomingMessage>=>{
-                return this.doWorkAsync(fname,params,noResult);
+                return this.doWork(fname,params,noResult);
             };
         }
         Object.assign(this,alex);
@@ -121,7 +121,7 @@ export class Slave extends EventTarget {
     /**
     * 
     */
-    public doWork(name: string, params?: any, handler?: Handler): void {
+    public doWorkSync(name: string, params?: any, handler?: Handler): void {
         if (!this.m_worker) {
             this.onError('worker closed.');
             return;
@@ -142,7 +142,7 @@ export class Slave extends EventTarget {
      * @param name 
      * @param params 
      */
-    public async doWorkAsync(name:string,params?:any,noResult?:boolean):Promise<IncomingMessage>{
+    public async doWork(name:string,params?:any,noResult?:boolean):Promise<IncomingMessage>{
         
         let promise = createResolvable<IncomingMessage>();
         if (!this.m_worker) {

@@ -26,7 +26,6 @@ class Server extends ModuleServer {
 // }
 
 
-
 window.addEventListener("load", (e: Event): void => {
     console.log(`got ${e.type} event in event handler (main)`);
     let server = new Server();
